@@ -11,7 +11,7 @@ with open("phonebook_raw.csv", encoding="utf-8") as f:
     # 1) Поместить Фамилию, Имя и Отчество человека 
     # в поля lastname, firstname и surname
     for row in contacts_list[1:]:
-        namelist = ' '.join(row[0:3]).strip().split()
+        namelist = ' '.join(row[0:3]).title().strip().split()
         namelist += [''] * (3 - len(namelist))
         row[0:3] = namelist
 
@@ -36,7 +36,7 @@ with open("phonebook_raw.csv", encoding="utf-8") as f:
             merged_contacts[key] = row[:]
             final_order.append(key)
         else:
-            for k in range(4, len(row)):
+            for k in range(3, len(row)):
                 if merged_contacts[key][k].strip() == "" and row[k].strip() != "":
                     merged_contacts[key][k] = row[k]
     contacts_list = [contacts_list[0]] + [merged_contacts[key] for key in final_order]
