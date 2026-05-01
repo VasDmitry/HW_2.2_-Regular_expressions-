@@ -28,19 +28,19 @@ with open("phonebook_raw.csv", encoding="utf-8") as f:
             row[5] = f'+7({match.group(1)}){match.group(2)}-{match.group(3)}-{match.group(4)}{ext}'   
 
     # 3) Объединить все дублирующиеся записи о человеке в одну.
-    delete_list = []
-    for i, row_1 in enumerate(contacts_list[1:], 1):
-        for j, row_2 in enumerate(contacts_list[(i+1):], i+1):
-            lastname, firstname, surname = row_1[0:3]
-            if j not in delete_list:
-                if re.match(rf'{lastname} {firstname} ?({surname})?', ' '.join(row_2[0:3])):
-                    delete_list.append(j)
-                    for k, el in enumerate(row_1[4:], 4):
-                        contacts_list[i][k] = row_2[k] if row_2[k].strip() != '' else row_1[k]      
-
-    for index in delete_list[::-1]:
-        del contacts_list[index]
-
+    merged_contacts = {}  # словарь с ключами
+    final_order = []  # список с правильным порядком записи в финальный список контактов
+    for row in contacts_list[1:]:
+        key = tuple(row[0:3])
+        if key not in merged_contacts:
+            merged_contacts[key] = row[:]
+            final_order.append(key)
+        else:
+            for k in range(4, len(row)):
+                if merged_contacts[key][k].strip() == "" and row[k].strip() != "":
+                    merged_contacts[key][k] = row[k]
+    contacts_list = [contacts_list[0]] + [merged_contacts[key] for key in final_order]
+    
 # Сохраните получившиеся данные в другой файл
 # код для записи файла в формате CSV
 with open("phonebook.csv", "w", encoding="utf-8", newline='') as f:
